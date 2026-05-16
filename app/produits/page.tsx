@@ -19,7 +19,10 @@ async function getProducts() {
 
   console.log("PRODUCTS:", data);
 
-  return data || [];
+  console.log("DATA:", data);
+console.log("ERROR:", error);
+
+return data || [];
 }
 
 export default async function ProduitsPage() {
