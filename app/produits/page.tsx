@@ -1,19 +1,25 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 async function getProducts() {
   const { data, error } = await supabase
     .from("products")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select("*");
 
   if (error) {
-    console.error(error);
+    console.error("SUPABASE ERROR:", error);
     return [];
   }
 
-  return data;
+  console.log("PRODUCTS:", data);
+
+  return data || [];
 }
 
 export default async function ProduitsPage() {
@@ -21,31 +27,31 @@ export default async function ProduitsPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">
+      <h1 className="text-4xl font-bold mb-8">
         Produits
       </h1>
 
-      <div className="space-y-4">
-        {products.map((product: any) => (
-          <div
-            key={product.id}
-            className="border rounded-xl p-4"
-          >
-            <h2 className="font-semibold text-xl">
-              {product.name}
-            </h2>
+      {products.length === 0 ? (
+        <p>Aucun produit pour le moment.</p>
+      ) : (
+        <div className="space-y-4">
+          {products.map((product: any) => (
+            <div
+              key={product.id}
+              className="border rounded-xl p-4"
+            >
+              <h2 className="text-xl font-semibold">
+                {product.name}
+              </h2>
 
-            <p>Catégorie : {product.category}</p>
-            <p>Fournisseur : {product.supplier}</p>
-            <p>Prix : {product.price} €</p>
-            <p>Unité : {product.unit}</p>
-          </div>
-        ))}
-
-        {products.length === 0 && (
-          <p>Aucun produit pour le moment.</p>
-        )}
-      </div>
+              <p>Catégorie : {product.category}</p>
+              <p>Fournisseur : {product.supplier}</p>
+              <p>Prix : {product.price} €</p>
+              <p>Unité : {product.unit}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
